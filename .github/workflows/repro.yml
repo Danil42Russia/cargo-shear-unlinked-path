@@ -1,0 +1,25 @@
+name: Reproduce cargo-shear unlinked file warning
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  repro:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Confirm the test is compiled and runs
+        run: cargo test --locked
+
+      - name: Install cargo-shear 1.13.4
+        run: cargo install cargo-shear --version 1.13.4 --locked
+
+      - name: Reproduce the false positive (expected to fail)
+        run: cargo shear --locked --deny-warnings
